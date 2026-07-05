@@ -42,7 +42,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="600px">
+    <el-dialog :title="dialogTitle" v-model="dialogVisible" width="600px">
       <el-form :model="form" :rules="rules" ref="formRef" label-width="100px">
         <el-form-item label="关联藏品" prop="book_id">
           <el-select v-model="form.book_id" placeholder="请选择藏品">
