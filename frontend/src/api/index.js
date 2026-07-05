@@ -5,15 +5,56 @@ const request = axios.create({
   timeout: 10000
 })
 
+request.interceptors.request.use(
+  config => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  error => {
+    return Promise.reject(error)
+  }
+)
+
 request.interceptors.response.use(
   response => {
     return response.data
   },
   error => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      window.location.href = '/login'
+    }
     console.error('API Error:', error)
     return Promise.reject(error)
   }
 )
+
+export const authAPI = {
+  login: (data) => request.post('/auth/login', data),
+  init: () => request.post('/auth/init'),
+  me: () => request.get('/auth/me')
+}
+
+export const userAPI = {
+  getAll: () => request.get('/users'),
+  getById: (id) => request.get(`/users/${id}`),
+  create: (data) => request.post('/users', data),
+  update: (id, data) => request.put(`/users/${id}`, data),
+  delete: (id) => request.delete(`/users/${id}`)
+}
+
+export const roleAPI = {
+  getAll: () => request.get('/roles'),
+  getById: (id) => request.get(`/roles/${id}`),
+  create: (data) => request.post('/roles', data),
+  update: (id, data) => request.put(`/roles/${id}`, data),
+  delete: (id) => request.delete(`/roles/${id}`),
+  getPermissions: () => request.get('/roles/permissions')
+}
 
 export const bookAPI = {
   getAll: () => request.get('/books'),

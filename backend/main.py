@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from backend.utils.database import engine, Base
-from backend.routers import books, damages, procedures, materials, material_usages, archives
+from backend.routers import books, damages, procedures, materials, material_usages, archives, auth, users, roles
+from backend.utils.auth import get_current_active_user
 
 Base.metadata.create_all(bind=engine)
 
@@ -15,12 +16,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(books.router)
-app.include_router(damages.router)
-app.include_router(procedures.router)
-app.include_router(materials.router)
-app.include_router(material_usages.router)
-app.include_router(archives.router)
+app.include_router(auth.router)
+app.include_router(users.router, dependencies=[Depends(get_current_active_user)])
+app.include_router(roles.router, dependencies=[Depends(get_current_active_user)])
+app.include_router(books.router, dependencies=[Depends(get_current_active_user)])
+app.include_router(damages.router, dependencies=[Depends(get_current_active_user)])
+app.include_router(procedures.router, dependencies=[Depends(get_current_active_user)])
+app.include_router(materials.router, dependencies=[Depends(get_current_active_user)])
+app.include_router(material_usages.router, dependencies=[Depends(get_current_active_user)])
+app.include_router(archives.router, dependencies=[Depends(get_current_active_user)])
 
 @app.get("/")
 def root():

@@ -1,7 +1,55 @@
-from sqlalchemy import Column, Integer, String, Text, Date, Float, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Text, Date, Float, ForeignKey, DateTime, Boolean
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from backend.utils.database import Base
+
+class Permission(Base):
+    __tablename__ = "permissions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False, unique=True)
+    code = Column(String(100), nullable=False, unique=True, index=True)
+    description = Column(Text)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class Role(Base):
+    __tablename__ = "roles"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False, unique=True)
+    code = Column(String(100), nullable=False, unique=True, index=True)
+    description = Column(Text)
+    is_admin = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    permissions = relationship("RolePermission", back_populates="role")
+    users = relationship("User", back_populates="role")
+
+class RolePermission(Base):
+    __tablename__ = "role_permissions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    role_id = Column(Integer, ForeignKey("roles.id"), nullable=False, index=True)
+    permission_id = Column(Integer, ForeignKey("permissions.id"), nullable=False, index=True)
+
+    role = relationship("Role", back_populates="permissions")
+    permission = relationship("Permission", backref="role_permissions")
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(100), nullable=False, unique=True, index=True)
+    password_hash = Column(String(500), nullable=False)
+    real_name = Column(String(100))
+    email = Column(String(200))
+    phone = Column(String(50))
+    role_id = Column(Integer, ForeignKey("roles.id"), nullable=False, index=True)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    role = relationship("Role", back_populates="users")
 
 class Book(Base):
     __tablename__ = "books"

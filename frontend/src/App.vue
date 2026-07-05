@@ -24,6 +24,19 @@
           <span class="header-title">{{ currentTitle }}</span>
         </div>
         <div class="header-right">
+          <div class="user-info">
+            <el-dropdown trigger="click">
+              <span class="user-name">
+                <el-icon><User /></el-icon>
+                {{ currentUser?.real_name || currentUser?.username || '用户' }}
+              </span>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
           <span class="current-time">{{ currentTime }}</span>
         </div>
       </header>
@@ -36,16 +49,21 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ElMessage } from 'element-plus'
+import { User } from '@element-plus/icons-vue'
 
 const menuItems = [
   { name: 'Books', path: '/books', label: '藏品管理', icon: '📜' },
   { name: 'Damages', path: '/damages', label: '病害存档', icon: '🔍' },
   { name: 'Procedures', path: '/procedures', label: '工序登记', icon: '✏️' },
   { name: 'Materials', path: '/materials', label: '物料台账', icon: '📦' },
-  { name: 'Archives', path: '/archives', label: '归档查询', icon: '📚' }
+  { name: 'Archives', path: '/archives', label: '归档查询', icon: '📚' },
+  { name: 'Users', path: '/users', label: '用户管理', icon: '👥' },
+  { name: 'Roles', path: '/roles', label: '角色管理', icon: '🛡️' }
 ]
 
 const currentTime = ref('')
+const currentUser = ref(JSON.parse(localStorage.getItem('user') || 'null'))
 
 const currentTitle = computed(() => {
   const item = menuItems.find(i => i.path === '/' + $route.path.split('/')[1])
@@ -62,6 +80,16 @@ const updateTime = () => {
     minute: '2-digit',
     second: '2-digit'
   })
+}
+
+const handleLogout = () => {
+  localStorage.removeItem('token')
+  localStorage.removeItem('user')
+  currentUser.value = null
+  ElMessage.success('退出登录成功')
+  setTimeout(() => {
+    window.location.href = '/login'
+  }, 500)
 }
 
 let timer = null
@@ -167,6 +195,23 @@ onUnmounted(() => {
   font-size: 18px;
   font-weight: bold;
   color: var(--text-primary);
+}
+
+.user-info {
+  margin-right: 20px;
+}
+
+.user-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.user-name:hover {
+  color: var(--primary-color);
 }
 
 .current-time {

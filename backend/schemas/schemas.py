@@ -2,6 +2,76 @@ from pydantic import BaseModel, Field, validator
 from datetime import date, datetime
 from typing import Optional, List
 
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    user: 'UserResponse'
+
+class TokenData(BaseModel):
+    username: Optional[str] = None
+
+class PermissionBase(BaseModel):
+    name: str = Field(..., max_length=100)
+    code: str = Field(..., max_length=100)
+    description: Optional[str] = None
+
+class PermissionCreate(PermissionBase):
+    pass
+
+class Permission(PermissionBase):
+    id: int
+    created_at: datetime
+
+    model_config = {'from_attributes': True}
+
+class RoleBase(BaseModel):
+    name: str = Field(..., max_length=100)
+    code: str = Field(..., max_length=100)
+    description: Optional[str] = None
+    is_admin: Optional[bool] = False
+
+class RoleCreate(RoleBase):
+    permission_ids: Optional[List[int]] = []
+
+class RoleUpdate(RoleBase):
+    name: Optional[str] = None
+    code: Optional[str] = None
+    permission_ids: Optional[List[int]] = []
+
+class Role(RoleBase):
+    id: int
+    created_at: datetime
+    permissions: List[Permission] = []
+
+    model_config = {'from_attributes': True}
+
+class UserBase(BaseModel):
+    username: str = Field(..., max_length=100)
+    real_name: Optional[str] = Field(None, max_length=100)
+    email: Optional[str] = Field(None, max_length=200)
+    phone: Optional[str] = Field(None, max_length=50)
+    role_id: int
+    is_active: Optional[bool] = True
+
+class UserCreate(UserBase):
+    password: str = Field(..., min_length=6)
+
+class UserUpdate(UserBase):
+    username: Optional[str] = None
+    password: Optional[str] = None
+
+class UserResponse(UserBase):
+    id: int
+    role: Role
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {'from_attributes': True}
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
 class BookBase(BaseModel):
     book_name: str = Field(..., max_length=200)
     book_code: str = Field(..., max_length=50)
