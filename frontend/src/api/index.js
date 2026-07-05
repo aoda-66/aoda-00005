@@ -8,7 +8,8 @@ const request = axios.create({
 request.interceptors.request.use(
   config => {
     const token = localStorage.getItem('token')
-    if (token) {
+    const isAuthRequest = config.url.startsWith('/auth')
+    if (token && !isAuthRequest) {
       config.headers.Authorization = `Bearer ${token}`
     }
     return config
@@ -24,9 +25,12 @@ request.interceptors.response.use(
   },
   error => {
     if (error.response && error.response.status === 401) {
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      window.location.href = '/login'
+      const isAuthRequest = error.config.url.startsWith('/auth')
+      if (!isAuthRequest) {
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        window.location.href = '/login'
+      }
     }
     console.error('API Error:', error)
     return Promise.reject(error)

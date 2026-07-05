@@ -63,14 +63,20 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth !== false)
+  const isLoginPage = to.path === '/login'
   
-  if (requiresAuth && !token) {
-    next('/login')
-  } else if (!requiresAuth && token && to.path === '/login') {
-    next('/books')
+  if (isLoginPage) {
+    if (token) {
+      next('/books')
+    } else {
+      next()
+    }
   } else {
-    next()
+    if (token) {
+      next()
+    } else {
+      next('/login')
+    }
   }
 })
 

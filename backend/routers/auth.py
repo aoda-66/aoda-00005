@@ -16,10 +16,12 @@ from backend.utils.captcha import generate_captcha, verify_captcha
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
+import base64
+
 @router.get("/captcha")
 def get_captcha():
     captcha_id, image_data = generate_captcha()
-    return {"captcha_id": captcha_id, "image": image_data.hex()}
+    return {"captcha_id": captcha_id, "image": base64.b64encode(image_data).decode('utf-8')}
 
 @router.post("/login", response_model=schemas.Token)
 def login_for_access_token(login_data: schemas.LoginRequest, db: Session = Depends(get_db)):
