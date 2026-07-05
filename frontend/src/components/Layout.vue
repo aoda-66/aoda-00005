@@ -51,6 +51,9 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { User } from '@element-plus/icons-vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
 
 const menuItems = [
   { name: 'Books', path: '/books', label: '藏品管理', icon: '📜' },
@@ -66,7 +69,7 @@ const currentTime = ref('')
 const currentUser = ref(JSON.parse(localStorage.getItem('user') || 'null'))
 
 const currentTitle = computed(() => {
-  const item = menuItems.find(i => i.path === '/' + $route.path.split('/')[1])
+  const item = menuItems.find(i => i.path === '/' + route.path.split('/')[1])
   return item ? item.label : '古籍修复数字管理平台'
 })
 

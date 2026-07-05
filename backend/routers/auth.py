@@ -1,5 +1,6 @@
 from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from backend.schemas import schemas
 from backend.models import models
@@ -11,11 +12,23 @@ from backend.utils.auth import (
     get_password_hash,
     ACCESS_TOKEN_EXPIRE_MINUTES
 )
+from backend.utils.captcha import generate_captcha, verify_captcha
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
+@router.get("/captcha")
+def get_captcha():
+    captcha_id, image_data = generate_captcha()
+    return {"captcha_id": captcha_id, "image": image_data.hex()}
+
 @router.post("/login", response_model=schemas.Token)
 def login_for_access_token(login_data: schemas.LoginRequest, db: Session = Depends(get_db)):
+    if not verify_captcha(login_data.captcha_id, login_data.captcha_code):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="验证码错误",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     user = authenticate_user(db, login_data.username, login_data.password)
     if not user:
         raise HTTPException(

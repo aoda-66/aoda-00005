@@ -71,6 +71,8 @@ class UserResponse(UserBase):
 class LoginRequest(BaseModel):
     username: str
     password: str
+    captcha_id: str
+    captcha_code: str
 
 class BookBase(BaseModel):
     book_name: str = Field(..., max_length=200)

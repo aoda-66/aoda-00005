@@ -36,7 +36,8 @@ request.interceptors.response.use(
 export const authAPI = {
   login: (data) => request.post('/auth/login', data),
   init: () => request.post('/auth/init'),
-  me: () => request.get('/auth/me')
+  me: () => request.get('/auth/me'),
+  getCaptcha: () => request.get('/auth/captcha')
 }
 
 export const userAPI = {
