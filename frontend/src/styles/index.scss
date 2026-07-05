@@ -1,0 +1,44 @@
+:root {
+  --primary-color: #8B5A2B;
+  --primary-light: #A07040;
+  --primary-dark: #6B4423;
+  --secondary-color: #D4A574;
+  --bg-color: #FDFBF7;
+  --bg-sidebar: #FAF7F2;
+  --text-primary: #2C1810;
+  --text-secondary: #6B5344;
+  --border-color: #E8DFD5;
+  --success-color: #7C9A7D;
+  --warning-color: #D4A574;
+  --danger-color: #B55A5A;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Noto Serif SC', 'Songti SC', serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-sidebar);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-color);
+}
