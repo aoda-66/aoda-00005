@@ -30,9 +30,7 @@
           </el-button>
         </el-form-item>
       </el-form>
-      <div class="login-footer">
-        <p>默认管理员账号：admin / 123456</p>
-      </div>
+
     </div>
   </div>
 </template>
@@ -40,8 +38,10 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
 import { authAPI } from '../api'
 
+const router = useRouter()
 const formRef = ref(null)
 const loading = ref(false)
 
@@ -63,9 +63,7 @@ const handleLogin = async () => {
     localStorage.setItem('token', response.access_token)
     localStorage.setItem('user', JSON.stringify(response.user))
     ElMessage.success('登录成功')
-    setTimeout(() => {
-      window.location.href = '/books'
-    }, 500)
+    router.push('/books')
   } catch (error) {
     loading.value = false
     if (error.response && error.response.status === 401) {
@@ -127,15 +125,5 @@ const handleLogin = async () => {
 
 .login-btn:hover {
   background: linear-gradient(135deg, #a06a36 0%, #8b5a2b 100%);
-}
-
-.login-footer {
-  text-align: center;
-}
-
-.login-footer p {
-  font-size: 12px;
-  color: #999;
-  margin: 0;
 }
 </style>
